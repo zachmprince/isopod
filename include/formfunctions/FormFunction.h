@@ -2,11 +2,13 @@
 
 #include "MooseObject.h"
 
-#include "OptimizationVectorPostprocessor.h"
+#include "OptimizationParameterVectorPostprocessor.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_matrix.h"
 
-class FormFunction : public MooseObject
+class FormFunction : public MooseObject,
+                     public VectorPostprocessorInterface,
+                     public PostprocessorInterface
 {
 public:
   static InputParameters validParams();
@@ -80,7 +82,7 @@ protected:
   const libMesh::Parallel::Communicator _my_comm;
 
   /// VPP to sent data to
-  OptimizationVectorPostprocessor & _results_vpp;
+  OptimizationParameterVectorPostprocessor & _parameter_vpp;
 
   /// Number of parameters
   dof_id_type _ndof;

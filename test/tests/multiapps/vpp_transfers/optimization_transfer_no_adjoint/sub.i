@@ -1,5 +1,11 @@
 
 [Mesh]
+  type = GeneratedMesh
+  dim = 2
+  nx = 10
+  ny = 20
+  xmax = 1
+  ymax = 2
 []
 
 [Variables]
@@ -18,23 +24,22 @@
   [./pt0]
     type = ConstantPointSource
     variable = temperature
-    value = 1.0
+    value = -2458
     point = '0.2 0.2'
   [../]
   [./pt1]
     type = ConstantPointSource
     variable = temperature
-    value = -0.5
+    value = 7257
     point = '0.2 0.8'
   [../]
   [./pt2]
     type = ConstantPointSource
     variable = temperature
-    value = -2
+    value = 26335
     point = '0.8 0.2'
   [../]
 []
-
 
 [BCs]
   [left]
@@ -84,13 +89,28 @@
   petsc_options_value = 'hypre boomeramg'
 []
 
+[VectorPostprocessors]
+  [measure_pts]
+    type = MeasuredDataPointSampler
+    variable = temperature
+    points = '0.3 0.3 0
+              0.4 1.0 0
+              0.8 0.5 0
+              0.8 0.6 0'
+    sort_by = id
+    measured_data = '100 204 320 216'
+  []
+[]
+
+
 [Controls]
-  [optimizationSamplerReceiver]
-    type = SamplerReceiver
+  [parameterReceiver]
+    type = ControlsReceiver
   []
 []
 
 
 [Outputs]
   console = true
+  exodus = true
 []

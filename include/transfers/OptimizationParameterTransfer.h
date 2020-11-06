@@ -12,26 +12,27 @@
 #include "MultiAppTransfer.h"
 
 // Forward declarations
-class SamplerReceiver;
+class ControlsReceiver;
 
-class OptimizationTransfer : public MultiAppTransfer
+class OptimizationParameterTransfer : public MultiAppTransfer
 {
 public:
   static InputParameters validParams();
 
-  OptimizationTransfer(const InputParameters & parameters);
+  OptimizationParameterTransfer(const InputParameters & parameters);
 
+  virtual void initialSetup() override;
   virtual void execute() override;
 
 private:
   /**
-   * Return the SamplerReceiver object and perform error checking.
+   * Return the ControlsReceiver object and perform error checking.
    * @param app_index The global sup-app index
    */
-  SamplerReceiver * getReceiver(unsigned int app_index);
+  ControlsReceiver * getReceiver(unsigned int app_index);
 
   /// Storage for the list of parameters to control
   const VectorPostprocessorName & _vpp_name;
-  /// The name of the SamplerReceiver Control object on the sub-application
+  /// The name of the ControlsReceiver Control object on the sub-application
   const std::string & _receiver_name;
 };

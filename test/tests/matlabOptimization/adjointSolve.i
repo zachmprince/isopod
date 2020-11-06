@@ -26,10 +26,10 @@
 
 [DiracKernels]
   [force_0]
-    type = FileConstantPointSource
-    variable = temperature
-    position_value_file=zAdjointInput/inputForces.csv
-    # make this take a vpp there is csv reader vpp so try having that vpp read in the csv instead of this and apply here.
+    type = VectorPostprocessorPointSource
+    variable = 'temperature'
+    value_name = 'value'
+    vector_postprocessor = 'csv_reader'
   []
 []
 
@@ -86,6 +86,11 @@
     block = '0'
     sort_by = id
     outputs = fullResponseVector
+  []
+  [csv_reader]
+    type = CSVReader
+    csv_file = 'zAdjointInput/inputForces.csv'
+    # execute_on = initial
   []
 []
 
