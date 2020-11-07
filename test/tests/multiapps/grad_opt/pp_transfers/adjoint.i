@@ -24,20 +24,26 @@
   [./pt0]
     type = ConstantPointSource
     variable = temperature
-    value = -2458
-    point = '0.2 0.2'
+    value = 10
+    point = '0.3 0.3'
   [../]
   [./pt1]
     type = ConstantPointSource
     variable = temperature
-    value = 7257
-    point = '0.2 0.8'
+    value = 10
+    point = '0.4 1.0'
   [../]
   [./pt2]
     type = ConstantPointSource
     variable = temperature
-    value = 26335
-    point = '0.8 0.2'
+    value = 10
+    point = '0.8 0.5'
+  [../]
+  [./pt3]
+    type = ConstantPointSource
+    variable = temperature
+    value = 10
+    point = '0.8 0.6'
   [../]
 []
 
@@ -91,31 +97,26 @@
 []
 
 [Postprocessors]
-  [data_pt_0]
+  [adjoint_pt_0]
     type = PointValue
     variable = temperature
-    point = '0.3 0.3 0'
+    point = '0.2 0.2 0'
   []
-  [data_pt_1]
+  [adjoint_pt_1]
     type = PointValue
     variable = temperature
-    point = '0.4 1.0 0'
+    point = '0.2 0.8 0'
   []
-  [data_pt_2]
+  [adjoint_pt_2]
     type = PointValue
     variable = temperature
-    point = '0.8 0.5 0'
-  []
-  [data_pt_3]
-    type = PointValue
-    variable = temperature
-    point = '0.8 0.6 0'
+    point = '0.8 0.2 0'
   []
 []
 
 # should be able to do all this in the transfer  line 40 of sampler Receiver
 [Controls]
-  [parameterReceiver]
+  [adjointReceiver]
     type = ControlsReceiver
   []
 []
@@ -124,4 +125,5 @@
 [Outputs]
   console = true
   exodus = true
+  file_base = 'adjoint'
 []
