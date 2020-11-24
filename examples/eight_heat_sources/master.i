@@ -15,12 +15,12 @@
   # tao_solver = taonm
   # petsc_options_iname='-tao_gatol'
   # petsc_options_value='1e-2'
-  tao_solver = taolmvm #TAOOWLQN #TAOBMRM #taolmvm #taocg
-  petsc_options_iname = '-tao_gatol'# -tao_cg_delta_max'
-  petsc_options_value = '1e-2'
-  # tao_solver = taontr
-  # petsc_options_iname='-tao_fd_hessian -tao_fd_delta -tao_ntr_min_radius -tao_ntr_max_radius -tao_ntr_init_type -tao_gatol'
-  # petsc_options_value='true 0.000001 0 1e16 constant 1e-2'
+  # tao_solver = taolmvm #TAOOWLQN #TAOBMRM #taolmvm #taocg
+  # petsc_options_iname = '-tao_gatol'# -tao_cg_delta_max'
+  # petsc_options_value = '1e-2'
+  tao_solver = taontr
+  petsc_options_iname='-tao_max_it -tao_fd_hessian -tao_fd_delta -tao_ntr_init_type  -tao_gatol -tao_ntr_min_radius -tao_ntr_max_radius '
+  petsc_options_value='1000 true 0.0001  constant 1e-2 .0001 100'# 0 1e16'
   verbose = true
 []
 
