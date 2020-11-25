@@ -42,8 +42,19 @@ OptimizeSolve::solve()
   _form_function = ffs[0];
   _form_function->initializePetscVectors();
 
+  // Grab objective function reporter
+  std::vector<UserObject *> userobjects;
+  _problem.theWarehouse()
+      .query()
+      .condition<AttribSystem>("UserObject")
+      .condition<AttribThread>(0)
+      .queryInto(userobjects);
+  for (auto & userobject : userobjects)
+    if (dynamic_cast<ObjectiveFunction *>(userobject))
+      _objective_function = dynamic_cast<ObjectiveFunction *>(userobject);
+
   // Communicator used by form function
-  MPI_Comm my_comm = _form_function->getComm().get();
+  MPI_Comm my_comm = _objective_function->getComm().get();
 
   // Petsc error code to be checked after each petsc call
   PetscErrorCode ierr;
@@ -90,14 +101,14 @@ OptimizeSolve::solve()
   ierr = TaoSetGradientRoutine(_tao, gradientFunctionWrapper, this);
   CHKERRQ(ierr);
   ierr = TaoSetHessianRoutine(_tao,
-                              _form_function->getHessian().mat(),
-                              _form_function->getHessian().mat(),
+                              _objective_function->getHessian().mat(),
+                              _objective_function->getHessian().mat(),
                               hessianFunctionWrapper,
                               this);
   CHKERRQ(ierr);
 
   // Set initial guess
-  ierr = TaoSetInitialVector(_tao, _form_function->getParameters().vec());
+  ierr = TaoSetInitialVector(_tao, _objective_function->getParameters().vec());
   CHKERRQ(ierr);
 
   // Set petsc options
@@ -175,37 +186,42 @@ OptimizeSolve::hessianFunctionWrapper(Tao /*tao*/, Vec x, Mat hessian, Mat /*pc*
 Real
 OptimizeSolve::objectiveFunction(const libMesh::PetscVector<Number> & x)
 {
-  _form_function->setParameters(x);
+  //  _form_function->setParameters(x);
+  _objective_function->setParameters(x);
   _problem.execute(EXEC_FORWARD);
   _problem.execMultiApps(EXEC_FORWARD);
   if (_solve_on.contains(EXEC_FORWARD))
     _inner_solve->solve();
-  return _form_function->computeObjective();
+  return _objective_function->computeObjective();
 }
 
 void
 OptimizeSolve::gradientFunction(const libMesh::PetscVector<Number> & x,
                                 libMesh::PetscVector<Number> & gradient)
 {
-  _form_function->setParameters(x);
+  //  _form_function->setParameters(x);
+  _objective_function->setParameters(x);
   _problem.execute(EXEC_ADJOINT);
   _problem.execMultiApps(EXEC_ADJOINT);
   if (_solve_on.contains(EXEC_ADJOINT))
     _inner_solve->solve();
-
-  _form_function->computeGradient();
-  gradient = _form_function->getGradient();
+  _objective_function->computeGradient();
+  //  _form_function->computeGradient();
+  gradient = _objective_function->getGradient();
 }
 
 void
 OptimizeSolve::hessianFunction(const libMesh::PetscVector<Number> & x,
                                libMesh::PetscMatrix<Number> & hessian)
 {
-  _form_function->setParameters(x);
+  //  _form_function->setParameters(x);
+  _objective_function->setParameters(x);
   _problem.execute(EXEC_HESSIAN);
   _problem.execMultiApps(EXEC_HESSIAN);
   if (_solve_on.contains(EXEC_HESSIAN))
     _inner_solve->solve();
-  _form_function->computeHessian();
-  hessian.swap(_form_function->getHessian());
+  //  _form_function->computeHessian();
+  //  hessian.swap(_form_function->getHessian());
+  _objective_function->computeHessian();
+  hessian.swap(_objective_function->getHessian());
 }

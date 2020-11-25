@@ -66,6 +66,7 @@ ObjectiveGradientMinimize::computeObjective()
 void
 ObjectiveGradientMinimize::computeGradient()
 {
+  // this has to come from teh parameters for boundary conditions
   for (dof_id_type i = 0; i < _ndof; ++i)
     _gradient.set(i, *_adjoint_data_computed[i]);
   _gradient.close();

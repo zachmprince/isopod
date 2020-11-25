@@ -7,6 +7,15 @@
   measured_vpp = 'measurements'
   objective = 1.0
 []
+[Reporters]
+  [objective_function]
+    type = QuadraticMinimizeReporter
+    parameter_names = 'param_0 param_1 param_2'
+    parameter_values = '5 8 1'
+    measured_vpp = 'measurements'
+    objective = 1.0
+  []
+[]
 
 [VectorPostprocessors]
   [results]
@@ -25,6 +34,8 @@
 [Executioner]
   type = Optimize
   tao_solver = TAOCG
+  petsc_options_iname='-tao_gatol -tao_cg_delta_max'
+  petsc_options_value='1e-4 1e-2'
   solve_on = none
   verbose = true
 []

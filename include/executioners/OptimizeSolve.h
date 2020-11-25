@@ -6,6 +6,8 @@
 #include "ExecFlagEnum.h"
 #include <petsctao.h>
 
+#include "ObjectiveFunction.h"
+
 class OptimizeSolve;
 
 class OptimizeSolve : public SolveObject
@@ -38,6 +40,9 @@ protected:
 
   /// Tao optimization object
   Tao _tao;
+
+  /// objective function reporter to communicate optimization data with subapps
+  ObjectiveFunction * _objective_function = nullptr;
 
 private:
   /// output optimization iteration solve data
