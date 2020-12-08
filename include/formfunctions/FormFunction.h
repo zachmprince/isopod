@@ -32,7 +32,7 @@ public:
    * Function to compute gradient.
    * This is the last call of the gradient routine.
    */
-  virtual void computeGradient(libMesh::PetscVector<Number> & gradient)
+  virtual void computeGradient(libMesh::PetscVector<Number> & /*gradient*/)
   {
     mooseError("Gradient function has not been defined for form function type ", _type);
   }
@@ -41,7 +41,7 @@ public:
    * Function to compute gradient.
    * This is the last call of the hessian routine.
    */
-  virtual void computeHessian(libMesh::PetscMatrix<Number> & hessian)
+  virtual void computeHessian(libMesh::PetscMatrix<Number> & /*hessian*/)
   {
     mooseError("Hessian function has not been defined for form function type ", _type);
   }
