@@ -27,12 +27,10 @@ DiffusionVariableIntegral::validParams()
 {
   InputParameters params = ElementIntegralPostprocessor::validParams();
 
-  // params.addRequiredCoupledVar("variable",
-  params.addRequiredParam<VariableName>("variable",
-                               "The name of the variable that this postprocessor applies to");
+  params.addCoupledVar("adjoint_sol", "Solution from the forward problem");
+  params.addRequiredParam<VariableName>(
+      "forward_sol", "Solution from the adjoint problem");
   params.addClassDescription("Integrates a function times variable over elements");
-  params.addParam<Real>(
-      "scale_factor", 1, "A scale factor to be applied to the postprocessor value");
   return params;
 }
 
@@ -49,13 +47,13 @@ DiffusionVariableIntegral::DiffusionVariableIntegral(const InputParameters & par
     //                              "variable",
     //                              Moose::VarKindType::VAR_ANY,
     //                              Moose::VarFieldType::VAR_FIELD_STANDARD),
-    _var_name(getParam<VariableName>("variable")),
-    _var(_subproblem.getStandardVariable(_tid, _var_name)),
-    _u(_var.sln()),
-    _grad_u(_var.gradSln()),
-    _grad_phi(_assembly.gradPhi(_var)),
-    _grad_test(_var.gradPhi()),
-    _scale_factor(getParam<Real>("scale_factor"))
+    _adjoint_sol(coupledValue("adjoint_sol")),
+    _forward_sol_name(getParam<VariableName>("forward_sol")),
+    _forward_sol(_subproblem.getStandardVariable(_tid, _forward_sol_name)),
+    _u(_forward_sol.sln()),
+    _grad_u(_forward_sol.gradSln()),
+    _grad_phi(_assembly.gradPhi(_forward_sol)),
+    _grad_test(_forward_sol.gradPhi())
 {
   // addMooseVariableDependency(&mooseVariableField());
 }
@@ -65,12 +63,13 @@ DiffusionVariableIntegral::computeQpIntegral()
 {
   mooseAssert(_grad_phi.size() == _grad_u.size(), "sizes do not match");
 
+  std::cout<<_adjoint_sol.size()<<std::endl;
   // std::cout<<_grad_u[0]<<std::endl;
   // std::cout<<_grad_test[0][0]<<std::endl;
   // std::cout<<_grad_test[0][0]*_grad_u[0]<<std::endl;
-  // std::cout<<std::endl;
+  std::cout<<std::endl;
   Real sum = 0;
-  for (unsigned int i =0 ; i<_grad_phi.size(); ++i)
+  for (unsigned int i = 0; i < _grad_phi.size(); ++i)
     sum += _grad_test[i][_qp] * _grad_u[i];
-  return _u[_qp] * sum;
+  return _adjoint_sol[_qp] * sum;
 }

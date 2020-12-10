@@ -27,16 +27,19 @@ public:
 protected:
   virtual Real computeQpIntegral() override;
 
+  /// Solution from the forwrad problem
+  const VariableValue _adjoint_sol;
+
   /// Name of variable
-  const VariableName _var_name;
+  const VariableName _forward_sol_name;
 
   /// Regular MooseVariable
-  MooseVariable & _var;
+  MooseVariable & _forward_sol;
 
-  /// Holds the solution at current quadrature points
+  /// Holds the forward solution at current quadrature points
   const VariableValue & _u;
 
-  /// Holds the solution gradient at the current quadrature points
+  /// Holds the forward solution gradient at the current quadrature points
   const VariableGradient & _grad_u;
 
   /// gradient of the shape function
@@ -44,6 +47,4 @@ protected:
 
   /// gradient of the test function
   const VariableTestGradient & _grad_test;
-
-  const Real & _scale_factor;
 };

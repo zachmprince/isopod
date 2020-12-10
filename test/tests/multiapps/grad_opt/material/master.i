@@ -1,3 +1,13 @@
+[Mesh]
+  type = GeneratedMesh
+  dim = 2
+  nx = 20
+  ny = 20
+  xmax = 2
+  ymax = 2
+[]
+
+
 [StochasticTools]
 []
 
@@ -32,6 +42,11 @@
     type = OptimizeFullSolveMultiApp
     input_files = adjoint.i
     execute_on = "ADJOINT"
+  []
+[]
+
+[AuxVariables]
+  [temperature_forward]
   []
 []
 
@@ -93,6 +108,24 @@
     multi_app = adjoint
     parameter_vpp = parameter_results
     to_control = adjointReceiver2
+  []
+  # get forward problem solution
+  [fromforward]
+    type = MultiAppCopyTransfer
+    multi_app = forward
+    direction = from_multiapp
+    source_variable = 'temperature'
+    variable = 'temperature_forward'
+    execute_on = 'initial linear'
+  []
+  # transfer variable to adjiont
+  [toAdjoint3]
+    type = MultiAppCopyTransfer
+    multi_app = adjoint
+    direction = to_multiapp
+    source_variable = 'temperature_forward'
+    variable = 'temperature_forward'
+    execute_on = 'initial linear'
   []
 []
 

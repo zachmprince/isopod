@@ -13,6 +13,11 @@
   []
 []
 
+[AuxVariables]
+  [temperature_forward]
+  []
+[]
+
 [Kernels]
   [heat_conduction]
     type = ADHeatConduction
@@ -114,7 +119,8 @@
   [adjoint_pt_0]
     # integral of load function gradient w.r.t parameter
     type = DiffusionVariableIntegral
-    variable = temperature
+    adjoint_sol = temperature
+    forward_sol = temperature_forward
   []
   [p1]
     type = ConstantValuePostprocessor
