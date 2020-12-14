@@ -36,13 +36,9 @@ OptimizeSolve::solve()
   _inner_solve->solve();
 
   // Grab form function
-  std::vector<FormFunction *> ffs;
-  _problem.theWarehouse().query().condition<AttribSystem>("FormFunction").queryInto(ffs);
-  if (ffs.empty())
+  if (!_problem.hasUserObject("FormFunction"))
     mooseError("No form function object found.");
-  else if (ffs.size() > 1)
-    mooseError("Only one form function per problem because of how its queried");
-  _form_function = ffs[0];
+  _form_function = &_problem.getUserObject<FormFunction>("FormFunction");
 
   // Initialize solution and matrix
   _form_function->setInitialCondition(*_parameters.get());
@@ -159,10 +155,8 @@ OptimizeSolve::objectiveFunctionWrapper(Tao /*tao*/, Vec x, Real * objective, vo
 {
   auto * solver = static_cast<OptimizeSolve *>(ctx);
 
-  libMesh::PetscVector<Number> & param_solver =
-      *cast_ptr<libMesh::PetscVector<Number> *>(solver->_parameters.get());
   libMesh::PetscVector<Number> param(x, solver->_my_comm);
-  param.swap(param_solver);
+  *solver->_parameters = param;
 
   (*objective) = solver->objectiveFunction();
   return 0;
@@ -173,10 +167,8 @@ OptimizeSolve::gradientFunctionWrapper(Tao /*tao*/, Vec x, Vec gradient, void * 
 {
   auto * solver = static_cast<OptimizeSolve *>(ctx);
 
-  libMesh::PetscVector<Number> & param_solver =
-      *cast_ptr<libMesh::PetscVector<Number> *>(solver->_parameters.get());
   libMesh::PetscVector<Number> param(x, solver->_my_comm);
-  param.swap(param_solver);
+  *solver->_parameters = param;
 
   libMesh::PetscVector<Number> grad(gradient, solver->_my_comm);
 
@@ -189,10 +181,8 @@ OptimizeSolve::hessianFunctionWrapper(Tao /*tao*/, Vec x, Mat hessian, Mat /*pc*
 {
   auto * solver = static_cast<OptimizeSolve *>(ctx);
 
-  libMesh::PetscVector<Number> & param_solver =
-      *cast_ptr<libMesh::PetscVector<Number> *>(solver->_parameters.get());
   libMesh::PetscVector<Number> param(x, solver->_my_comm);
-  param.swap(param_solver);
+  *solver->_parameters = param;
 
   libMesh::PetscMatrix<Number> mat(hessian, solver->_my_comm);
 

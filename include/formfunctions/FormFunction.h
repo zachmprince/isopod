@@ -1,19 +1,20 @@
 #pragma once
 
-#include "MooseObject.h"
+#include "GeneralReporter.h"
 
 #include "OptimizeSolve.h"
-#include "OptimizationParameterVectorPostprocessor.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_matrix.h"
 
-class FormFunction : public MooseObject,
-                     public VectorPostprocessorInterface,
-                     public PostprocessorInterface
+class FormFunction : public GeneralReporter
 {
 public:
   static InputParameters validParams();
   FormFunction(const InputParameters & parameters);
+
+  void initialize() override final {}
+  void execute() override final {}
+  void finalize() override final {}
 
   /**
    * Function to initialize petsc vectors from vpp data
@@ -45,20 +46,22 @@ public:
     mooseError("Hessian function has not been defined for form function type ", _type);
   }
 
-  /**
-   * Function to retrieve current parameters
-   */
-  dof_id_type getNumberOfParameters() const { return _ndof; }
-
 protected:
-  /// VPP to send data to
-  OptimizationParameterVectorPostprocessor & _parameter_vpp;
+  /// Helper for getting or declaring data
+  const std::vector<Real> & getDataValueHelper(const std::string & get_param,
+                                               const std::string & declare_param);
 
-  /// Const reference to vpp data
-  std::vector<const VectorPostprocessorValue *> _parameters;
-
+  /// Parameter names
+  const std::vector<ReporterValueName> & _parameter_names;
   /// Number of parameters
-  dof_id_type _ndof = 0;
+  const unsigned int _nparam;
+  /// Number of values for each parameter
+  const std::vector<dof_id_type> & _nvalues;
+  /// Total number of degrees of freedom
+  const dof_id_type _ndof;
+
+  /// Parameter values declared as reporter data
+  std::vector<std::vector<Real> *> _parameters;
 
 private:
   /**
