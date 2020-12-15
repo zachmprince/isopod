@@ -1,10 +1,4 @@
 [Mesh]
-  type = GeneratedMesh
-  dim = 2
-  nx = 10
-  ny = 20
-  xmax = 1
-  ymax = 2
 []
 
 [Variables]
@@ -18,19 +12,6 @@
     variable = temperature
   []
 []
-
-[DiracKernels]
-  [pt]
-    type = VectorPostprocessorPointSource
-    variable = temperature
-    vector_postprocessor = point_source
-    x_coord_name = x
-    y_coord_name = y
-    z_coord_name = z
-    value_name = value
-  []
-[]
-
 
 [BCs]
   [left]
@@ -49,13 +30,13 @@
     type = DirichletBC
     variable = temperature
     boundary = bottom
-    value = 0
+    value = 200
   []
   [top]
     type = DirichletBC
     variable = temperature
     boundary = top
-    value = 0
+    value = 100
   []
 []
 
@@ -76,33 +57,25 @@
   petsc_options_value = 'hypre boomeramg'
 []
 
-[Postprocessors]
-  [adjoint_pt_0]
-    type = SideIntegralVariablePostprocessor
+[VectorPostprocessors]
+  [data_pt]
+    type = MeasuredDataPointSampler
     variable = temperature
-    boundary = left
-  []
-  [adjoint_pt_1]
-    type = SideIntegralVariablePostprocessor
-    variable = temperature
-    boundary = right
+    points = '0.2 0.2 0
+              0.8 0.6 0
+              0.2 1.4 0
+              0.8 1.8 0'
+    measured_values = '199 214 154 129'
   []
 []
 
-[VectorPostprocessors]
-  [point_source]
-    type = ConstantVectorPostprocessor
-    vector_names = 'x y z value'
-    value = '0.2 0.8 0.2 0.8; 0.2 0.6 1.4 1.8; 0 0 0; 10 10 10 10'
-  []
-  [adjoint_pt]
-    type = VectorOfPostprocessors
-    postprocessors = 'adjoint_pt_0 adjoint_pt_1'
+[Controls]
+  [parameterReceiver]
+    type = ControlsReceiver
   []
 []
 
 [Outputs]
-  console = true
   exodus = true
-  file_base = 'adjoint'
+  file_base = 'forward'
 []

@@ -1,11 +1,4 @@
-
 [Mesh]
-  type = GeneratedMesh
-  dim = 2
-  nx = 20
-  ny = 20
-  xmax = 2
-  ymax = 2
 []
 
 [Variables]
@@ -15,7 +8,7 @@
 
 [Kernels]
   [heat_conduction]
-    type = ADHeatConduction
+    type = HeatConduction
     variable = temperature
   []
 []
@@ -41,19 +34,19 @@
     value = 0
   []
   [right]
-    type = NeumannBC
+    type = DirichletBC
     variable = temperature
     boundary = right
     value = 0
   []
   [bottom]
-    type = DirichletBC
+    type = NeumannBC
     variable = temperature
     boundary = bottom
     value = 0
   []
   [top]
-    type = DirichletBC
+    type = NeumannBC
     variable = temperature
     boundary = top
     value = 0
@@ -62,7 +55,7 @@
 
 [Materials]
   [steel]
-    type = ADGenericConstantMaterial
+    type = GenericConstantMaterial
     prop_names = thermal_conductivity
     prop_values = 5
   []
@@ -77,19 +70,52 @@
   petsc_options_value = 'hypre boomeramg'
 []
 
+
+# from forward.i
+# [Functions]
+#   [sin_function]
+#     type = ParsedFunction
+#     value = a*sin(2*pi*b*(y+c))+d
+#     vars = 'a b c d'
+#     vals = '500 0.5 p1 p2'
+#   []
+# []
+
 [Functions]
-  [volumetric_heat_func_deriv]
+  [sin_deriv_c]
     type = ParsedFunction
-    value = sin(x*pi/2)*sin(y*pi/2)
+    value = 2*pi*a*b*cos(2*pi*b*(c+y))
+    vars = 'a b c'
+    vals = '500 0.5 p1'
+  []
+  [sin_deriv_d]
+    type = ParsedFunction
+    value = 1.0
   []
 []
 
 [Postprocessors]
-  [adjoint_pt_0]
-    # integral of load function gradient w.r.t parameter
-    type = VariableFunctionElementIntegral
-    function = volumetric_heat_func_deriv
+  [adjoint_bc_0]
+    type = VariableFunctionSideIntegral
+    boundary = 'left top bottom'
+    function = sin_deriv_c
     variable = temperature
+  []
+  [adjoint_bc_1]
+    type = VariableFunctionSideIntegral
+    boundary = 'left top bottom'
+    function = sin_deriv_d
+    variable = temperature
+  []
+  [p1]
+    type = ConstantValuePostprocessor
+    value = 0
+    execute_on = LINEAR
+  []
+  [p2]
+    type = ConstantValuePostprocessor
+    value = 0
+    execute_on = LINEAR
   []
 []
 
@@ -97,16 +123,25 @@
   [point_source]
     type = ConstantVectorPostprocessor
     vector_names = 'x y z value'
-    value = '0.2 0.8 0.2 0.8; 0.2 0.6 1.4 1.8; 0 0 0 0; 10 10 10 10'
+    value = '0.2 0.8 0.2 0.8;
+             0.2 0.6 1.4 1.8;
+             0   0   0   0;
+             10  10  10  10'
   []
-  [adjoint_pt]
+  [adjoint_bc]
     type = VectorOfPostprocessors
-    postprocessors = 'adjoint_pt_0'
+    postprocessors = 'adjoint_bc_0 adjoint_bc_1'
+   []
+ []
+
+[Controls]
+  [adjointReceiver]
+    type = ControlsReceiver
   []
 []
 
+
 [Outputs]
-  console = true
   exodus = true
   file_base = 'adjoint'
 []
