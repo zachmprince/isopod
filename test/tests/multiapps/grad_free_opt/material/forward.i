@@ -73,6 +73,10 @@
   []
 []
 
+[Problem]
+  type = FEProblem
+[]
+
 [Executioner]
   type = Steady
   solve_type = PJFNK
@@ -83,30 +87,22 @@
 []
 
 [Postprocessors]
-  [data_pt_0]
-    type = PointValue
-    variable = temperature
-    point = '0.2 0.2 0'
-  []
-  [data_pt_1]
-    type = PointValue
-    variable = temperature
-    point = '0.8 0.6 0'
-  []
-  [data_pt_2]
-    type = PointValue
-    variable = temperature
-    point = '0.2 1.4 0'
-  []
-  [data_pt_3]
-    type = PointValue
-    variable = temperature
-    point = '0.8 1.8 0'
-  []
   [p1]
     type = ConstantValuePostprocessor
     value = 10
     execute_on = 'initial linear'
+  []
+[]
+
+[VectorPostprocessors]
+  [data_pt]
+    type = PointValueSampler
+    points = '0.2 0.2 0
+              0.8 0.6 0
+              0.2 1.4 0
+              0.8 1.8 0'
+    variable = temperature
+    sort_by = x
   []
 []
 
@@ -117,7 +113,8 @@
 []
 
 [Outputs]
-  console = true
+  console = false
   exodus = true
+  csv=true
   file_base = 'forward'
 []
