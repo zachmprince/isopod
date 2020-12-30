@@ -1,4 +1,3 @@
-
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -12,46 +11,73 @@
   [temperature]
   []
 []
-
-[AuxVariables]
-  [temperature_forward]
-  []
-[]
-
 [Kernels]
   [heat_conduction]
-    type = ADHeatConduction
+    type = HeatConduction
     variable = temperature
   []
 []
 
 [DiracKernels]
-  [./pt0]
-    type = ConstantPointSource
+  [pt]
+    type = VectorPostprocessorPointSource
     variable = temperature
-    value = 10
-    point = '0.2 0.2 0'
-  [../]
-  [./pt1]
-    type = ConstantPointSource
-    variable = temperature
-    value = 10
-    point = '0.8 0.6 0'
-  [../]
-  [./pt2]
-    type = ConstantPointSource
-    variable = temperature
-    value = 10
-    point = '0.2 1.4 0'
-  [../]
-  [./pt3]
-    type = ConstantPointSource
-    variable = temperature
-    value = 10
-    point = '0.8 1.8 0'
-  [../]
+    vector_postprocessor = point_source
+    x_coord_name = x
+    y_coord_name = y
+    z_coord_name = z
+    value_name = value
+  []
 []
 
+[AuxVariables]
+  [temperature_forward]
+  []
+  [grad_Tx]#these transfers are just to check the gradient of temperature forward copmuted in grad_Tx
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Ty]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Tz]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Tfx]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Tfy]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Tfz]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+[]
+[AuxKernels]
+  [grad_Tfx]
+    type = VariableGradientComponent
+    component = x
+    variable = grad_Tfx
+    gradient_variable = temperature_forward
+  []
+  [grad_Tfy]
+    type = VariableGradientComponent
+    component = y
+    variable = grad_Tfy
+    gradient_variable = temperature_forward
+  []
+  [grad_Tfz]
+    type = VariableGradientComponent
+    component = z
+    variable = grad_Tfz
+    gradient_variable = temperature_forward
+  []
+[]
 
 [BCs]
   [left]
@@ -91,19 +117,15 @@
 
 [Materials]
   [steel]
-    type = ADGenericFunctionMaterial
+    type = GenericFunctionMaterial
     prop_names = 'thermal_conductivity'
     prop_values = 'thermo_conduct'
   []
   [volumetric_heat]
-    type = ADGenericFunctionMaterial
+    type = GenericFunctionMaterial
     prop_names = 'volumetric_heat'
     prop_values = '1000'
   []
-[]
-
-[Problem]#do we need this
-  type = FEProblem
 []
 
 [Executioner]
@@ -116,11 +138,13 @@
 []
 
 [Postprocessors]
-  [adjoint_pt_0]
+  [pp_adjoint_grad]
     # integral of load function gradient w.r.t parameter
     type = DiffusionVariableIntegral
-    adjoint_sol = temperature
-    forward_sol = temperature_forward
+    variable = temperature
+    variable_grad_x = grad_Tfx
+    variable_grad_y = grad_Tfy
+    variable_grad_z = grad_Tfz
   []
   [p1]
     type = ConstantValuePostprocessor
@@ -129,18 +153,24 @@
   []
 []
 
-[Controls]
-  [adjointReceiver]
-    type = ControlsReceiver
+[VectorPostprocessors]
+  [point_source]
+    type = ConstantVectorPostprocessor
+    vector_names = 'x y z value'
+    value = '0.2 0.8 0.2 0.8;
+             0.2 0.6 1.4 1.8;
+             0   0   0   0;
+             10  10  10  10'
   []
-  [adjointReceiver2]
-    type = ControlsReceiver
+  [adjoint_grad]
+    type = VectorOfPostprocessors
+    postprocessors = 'pp_adjoint_grad'
   []
 []
-
 
 [Outputs]
   console = true
   exodus = true
   file_base = 'adjoint'
+  execute_on = NONLINEAR
 []

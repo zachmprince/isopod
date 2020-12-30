@@ -11,17 +11,51 @@
   [temperature]
   []
 []
-
 [Kernels]
   [heat_conduction]
-    type = ADHeatConduction
+    type = HeatConduction
     variable = temperature
   []
   [./heat_source]
-    type = ADMatHeatSource
-    material_property = volumetric_heat
+    type = BodyForce
     variable = temperature
+    value = 1000
   [../]
+[]
+
+[AuxVariables]
+  [grad_Tx]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Ty]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [grad_Tz]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+[]
+[AuxKernels]
+  [grad_Tx]
+    type = VariableGradientComponent
+    component = x
+    variable = grad_Tx
+    gradient_variable = temperature
+  []
+  [grad_Ty]
+    type = VariableGradientComponent
+    component = y
+    variable = grad_Ty
+    gradient_variable = temperature
+  []
+  [grad_Tz]
+    type = VariableGradientComponent
+    component = z
+    variable = grad_Tz
+    gradient_variable = temperature
+  []
 []
 
 [BCs]
@@ -62,14 +96,9 @@
 
 [Materials]
   [steel]
-    type = ADGenericFunctionMaterial
+    type = GenericFunctionMaterial
     prop_names = 'thermal_conductivity'
     prop_values = 'thermo_conduct'
-  []
-  [volumetric_heat]
-    type = ADGenericFunctionMaterial
-    prop_names = 'volumetric_heat'
-    prop_values = '1000'
   []
 []
 
@@ -82,27 +111,19 @@
   petsc_options_value = 'hypre boomeramg'
 []
 
+[VectorPostprocessors]
+  [data_pt]
+    type = MeasuredDataPointSampler
+    variable = temperature
+    points = '0.2 0.2 0
+              0.8 0.6 0
+              0.2 1.4 0
+              0.8 1.8 0'
+    measured_values = '226 254 214 146'
+  []
+[]
+
 [Postprocessors]
-  [data_pt_0]
-    type = PointValue
-    variable = temperature
-    point = '0.2 0.2 0'
-  []
-  [data_pt_1]
-    type = PointValue
-    variable = temperature
-    point = '0.8 0.6 0'
-  []
-  [data_pt_2]
-    type = PointValue
-    variable = temperature
-    point = '0.2 1.4 0'
-  []
-  [data_pt_3]
-    type = PointValue
-    variable = temperature
-    point = '0.8 1.8 0'
-  []
   [p1]
     type = ConstantValuePostprocessor
     value = 10
@@ -120,4 +141,5 @@
   console = true
   exodus = true
   file_base = 'forward'
+  execute_on = NONLINEAR
 []

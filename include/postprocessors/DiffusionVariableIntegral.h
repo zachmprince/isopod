@@ -9,42 +9,33 @@
 
 #pragma once
 
-#include "ElementIntegralPostprocessor.h"
+#include "ElementIntegralVariablePostprocessor.h"
 
 class DiffusionVariableIntegral;
 
 template <>
 InputParameters validParams<DiffusionVariableIntegral>();
 
-class DiffusionVariableIntegral : public ElementIntegralPostprocessor
-                                  // public MooseVariableInterface<Real>
+class DiffusionVariableIntegral : public ElementIntegralVariablePostprocessor
 {
 public:
   static InputParameters validParams();
 
   DiffusionVariableIntegral(const InputParameters & parameters);
 
+  virtual Real getValue() override;
+
 protected:
   virtual Real computeQpIntegral() override;
-
-  /// Solution from the forwrad problem
-  const VariableValue _adjoint_sol;
-
-  /// Name of variable
-  const VariableName _forward_sol_name;
-
-  /// Regular MooseVariable
-  MooseVariable & _forward_sol;
-
-  /// Holds the forward solution at current quadrature points
-  const VariableValue & _u;
-
-  /// Holds the forward solution gradient at the current quadrature points
-  const VariableGradient & _grad_u;
-
-  /// gradient of the shape function
+  const VariableValue & _variable_grad_x;
+  const VariableValue & _variable_grad_y;
+  const VariableValue & _variable_grad_z;
+  //  /// Holds the forward solution gradient at the current quadrature points
+  //  const VariableGradient & _grad_other_var;
+  //
+  //  /// gradient of the shape function
   const VariablePhiGradient & _grad_phi;
-
+  //
   /// gradient of the test function
-  const VariableTestGradient & _grad_test;
+  //  const VariableTestGradient & _grad_test;
 };
