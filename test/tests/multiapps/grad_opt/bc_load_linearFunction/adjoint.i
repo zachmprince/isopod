@@ -111,14 +111,6 @@
   []
 []
 
-
-[Controls]
-  [adjointReceiver]
-    type = ControlsReceiver
-  []
-[]
-
-
 [Outputs]
   console = true
   exodus = true
