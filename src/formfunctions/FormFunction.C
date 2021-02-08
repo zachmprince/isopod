@@ -42,12 +42,27 @@ FormFunction::FormFunction(const InputParameters & parameters)
     paramError("num_parameters",
                "There should be a number in 'num_parameters' for each name in 'parameter_names'.");
 
+  if (_lower_bounds.size() != _nparam)
+    paramError("lower_bounds", "Lower bound data is not equal to the total number of parameters.");
+
+  if (_upper_bounds.size() != _nparam)
+    paramError("upper_bounds", "Upper bound data is not equal to the total number of parameters.");
+
   std::vector<Real> initial_condition = isParamValid("initial_condition")
                                             ? getParam<std::vector<Real>>("initial_condition")
                                             : std::vector<Real>(_ndof, 0.0);
+
   if (initial_condition.size() != _ndof)
     paramError("initial_condition",
                "Initial condition must be same length as the total number of parameter values.");
+
+  // Making the default initial condition an average of upper_bounds and lower_bounds
+  // if they are provided and no initial condition is provided
+  if (isParamValid("lower_bounds") && isParamValid("upper_bounds") && !isParamValid("initial_condition"))
+    {
+      for (unsigned int i = 0; i < _parameter_names.size(); ++i)
+        initial_condition[i] = 0.5 * (_lower_bounds[i] + _upper_bounds[i]);
+    }
 
   _parameters.reserve(_nparam);
   unsigned int v = 0;
@@ -59,11 +74,6 @@ FormFunction::FormFunction(const InputParameters & parameters)
                            initial_condition.begin() + v + _nvalues[i]);
     v += _nvalues[i];
   }
-
-  if (_lower_bounds.size() != _nparam)
-    paramError("lower_bounds", "Lower bound data is not equal to the total number of parameters.");
-  if (_upper_bounds.size() != _nparam)
-    paramError("upper_bounds", "Upper bound data is not equal to the total number of parameters.");
 }
 
 void
