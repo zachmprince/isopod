@@ -21,6 +21,7 @@ FormFunction::validParams()
       "lower_bounds", "lower bounds for each parameter values, default is -infinity.");
   params.addParam<std::vector<Real>>(
       "upper_bounds", "upper bounds for each parameter values, default is infinity.");
+  params.addParam<Real>("scale_factor", 1.0, "Scale factor for the objective function.");
   return params;
 }
 
@@ -36,6 +37,7 @@ FormFunction::FormFunction(const InputParameters & parameters)
     _upper_bounds(isParamValid("upper_bounds")
                       ? getParam<std::vector<Real>>("upper_bounds")
                       : computeDefaultBounds(std::numeric_limits<double>::infinity())),
+    _scale_factor(getParam<Real>("scale_factor")),
     _misfit(getDataValueHelper("misfit_computed", "misfit_name"))
 {
   if (_parameter_names.size() != _nvalues.size())
@@ -138,5 +140,5 @@ FormFunction::computeObjective()
 
   val = 0.5 * val;
 
-  return val;
+  return _scale_factor * val;
 }

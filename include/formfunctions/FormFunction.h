@@ -83,6 +83,9 @@ protected:
   const std::vector<Real> _lower_bounds;
   const std::vector<Real> _upper_bounds;
 
+  /// Scale factor for the objective function
+  const Real & _scale_factor;
+
   /// vector of misfit data
   const std::vector<Real> & _misfit;
 
