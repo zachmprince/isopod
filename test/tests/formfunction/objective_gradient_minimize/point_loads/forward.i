@@ -2,20 +2,30 @@
   type = GeneratedMesh
   dim = 2
   nx = 10
-  ny = 20
+  ny = 10
   xmax = 1
-  ymax = 2
+  ymax = 1.4
 []
 
 [Variables]
   [temperature]
+    order = FIRST
+    family = LAGRANGE
+  []
+[]
+
+[AuxVariables]
+  [saved_t]
+    order = FIRST
+    family = LAGRANGE
   []
 []
 
 [Kernels]
   [heat_conduction]
-    type = ADHeatConduction
+    type = HeatConduction
     variable = temperature
+    save_in = saved_t
   []
 []
 
@@ -36,31 +46,31 @@
     type = DirichletBC
     variable = temperature
     boundary = left
-    value = 0
+    value = 300
   []
   [right]
     type = DirichletBC
     variable = temperature
     boundary = right
-    value = 0
+    value = 300
   []
   [bottom]
     type = DirichletBC
     variable = temperature
     boundary = bottom
-    value = 0
+    value = 300
   []
   [top]
     type = DirichletBC
     variable = temperature
     boundary = top
-    value = 0
+    value = 300
   []
 []
 
 [Materials]
   [steel]
-    type = ADGenericConstantMaterial
+    type = GenericConstantMaterial
     prop_names = thermal_conductivity
     prop_values = 5
   []
@@ -79,16 +89,19 @@
   [point_source]
     type = ConstantVectorPostprocessor
     vector_names = 'x y z value'
-    value = '0.2 0.2 0.8; 0.2 0.8 0.2; 0 0 0; -2458 7257 26335'
+    value = '0.35 0.4 0.7;
+             0.20 1.0 0.56;
+             0 0 0;
+             6392 5570 4033'
   []
   [data_pt]
     type = MeasuredDataPointSampler
     variable = temperature
-    points = '0.3 0.3 0
-              0.4 1.0 0
-              0.8 0.5 0
-              0.8 0.6 0'
-    measured_values = '100 204 320 216'
+    points = '0.5 0.28 0
+              0.55 0.56 0
+              0.55 0.82 0
+              0.5 1.0 0'
+    measured_values = '280 315 321 327'
   []
 []
 

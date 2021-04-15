@@ -6,6 +6,7 @@ InputParameters
 ObjectiveMinimize::validParams()
 {
   InputParameters params = FormFunction::validParams();
+  params.addClassDescription("Inverse optimization reporter for gradient free optimization");
   return params;
 }
 
