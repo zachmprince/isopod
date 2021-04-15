@@ -6,7 +6,8 @@ InputParameters
 ObjectiveGradientMinimize::validParams()
 {
   InputParameters params = FormFunction::validParams();
-
+  params.addClassDescription(
+      "Inverse optimization reporter for gradient based optimization using an adjoint");
   params.addParam<ReporterName>("adjoint_data_computed",
                                 "Name of reporter value containing adjoint point values.");
   params.addParam<ReporterValueName>(

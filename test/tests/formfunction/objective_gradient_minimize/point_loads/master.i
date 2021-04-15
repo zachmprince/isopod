@@ -5,6 +5,7 @@
   type = ObjectiveGradientMinimize
   parameter_names = 'parameter_results'
   num_values = '3'
+  initial_condition = '0 0 0'
   misfit_name = 'misfit'
   adjoint_data_name = 'adjoint'
 []
@@ -12,8 +13,8 @@
 [Executioner]
   type = Optimize
   tao_solver = TAOCG
-  petsc_options_iname = '-tao_gatol -tao_max_it'
-  petsc_options_value = '1e-1 50'
+  petsc_options_iname = '-tao_gatol -tao_max_it'# -tao_ls_type'
+  petsc_options_value = '1e-2 200'# unit'
   verbose = true
 []
 
@@ -70,8 +71,6 @@
   []
   [optInfo]
     type = OptimizationInfo
-    #items = 'current_iterate'
-    #execute_on=timestep_end
   []
 []
 
