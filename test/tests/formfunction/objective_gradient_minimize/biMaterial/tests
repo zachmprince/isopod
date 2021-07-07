@@ -1,0 +1,10 @@
+[Tests]
+  [bimaterial]
+    type = CSVDiff
+    override_columns ="adjoint misfit p1"
+    override_rel_err = "10 10 1e-1"
+    override_abs_zero = "1e-6 1e-6 1e-6"
+    input = master.i
+    csvdiff = master_FormFunction_0001.csv
+  []
+[]
