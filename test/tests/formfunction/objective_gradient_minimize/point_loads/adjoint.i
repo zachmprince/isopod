@@ -2,13 +2,22 @@
   type = GeneratedMesh
   dim = 2
   nx = 10
-  ny = 20
+  ny = 10
   xmax = 1
-  ymax = 2
+  ymax = 1.4
 []
 
 [Variables]
   [temperature]
+    order = FIRST
+    family = LAGRANGE
+  []
+[]
+
+[AuxVariables]
+  [saved_t]
+    order = FIRST
+    family = LAGRANGE
   []
 []
 
@@ -16,6 +25,7 @@
   [heat_conduction]
     type = ADHeatConduction
     variable = temperature
+    save_in = saved_t
   []
 []
 
@@ -79,13 +89,16 @@
   [point_source]
     type = ConstantVectorPostprocessor
     vector_names = 'x y z value'
-    value = '0.3 0.4 0.8 0.8; 0.3 1.0 0.5 0.6; 0 0 0 0; 10 10 10 10'
+    value = '0.5 0.55 0.55 0.5;
+             0.28 0.56 0.82 1.1;
+             0 0 0 0;
+             10 10 10 10'
   []
   [data_pt]
     type = PointValueSampler
-    points = '0.2 0.2 0
-              0.2 0.8 0
-              0.8 0.2 0'
+    points = '0.35 0.20 0
+              0.4 1.0 0
+              0.7 0.56 0'
     variable = temperature
     sort_by = id
   []
